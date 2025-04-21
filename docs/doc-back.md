@@ -7,6 +7,122 @@
 - **Authentification** : JWT via Strapi
 - **Environnement** : Node.js
 
+## Structure d'une API dans Strapi
+
+Chaque API dans Strapi doit avoir la structure suivante :
+
+```
+src/api/[nom-api]/
+├── content-types/
+│   └── [nom-api]/
+│       └── schema.json    # Définition du modèle
+├── controllers/
+│   └── [nom-api].js      # Logique de contrôle
+├── routes/
+│   └── [nom-api].js      # Définition des routes
+└── services/
+    └── [nom-api].js      # Logique métier
+```
+
+### Exemple de configuration complète
+
+1. **Schema** (`content-types/[nom-api]/schema.json`) :
+```json
+{
+  "kind": "collectionType",
+  "collectionName": "models",
+  "info": {
+    "displayName": "Model",
+    "pluralName": "models",
+    "singularName": "model"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    }
+  }
+}
+```
+
+2. **Controller** (`controllers/[nom-api].js`) :
+```javascript
+'use strict';
+
+const { createCoreController } = require('@strapi/strapi').factories;
+
+module.exports = createCoreController('api::model.model');
+```
+
+3. **Routes** (`routes/[nom-api].js`) :
+```javascript
+'use strict';
+
+const { createCoreRouter } = require('@strapi/strapi').factories;
+
+module.exports = createCoreRouter('api::model.model');
+```
+
+4. **Service** (`services/[nom-api].js`) :
+```javascript
+'use strict';
+
+const { createCoreService } = require('@strapi/strapi').factories;
+
+module.exports = createCoreService('api::model.model');
+```
+
+## Débogage d'une API
+
+### Vérification de la structure
+
+1. **Vérifier que tous les fichiers nécessaires existent** :
+   - Schema
+   - Controller
+   - Routes
+   - Service
+
+2. **Vérifier les permissions** :
+   - Dans `config/plugins/users-permissions.js`
+   - Dans `config/roles/authenticated.json`
+   - Dans l'interface d'administration de Strapi
+
+3. **Vérifier les logs** :
+   - Activer les logs détaillés dans le contrôleur
+   - Vérifier les logs du serveur lors des requêtes
+
+### Erreurs courantes
+
+1. **Erreur 500 (Internal Server Error)** :
+   - Vérifier que le service existe
+   - Vérifier les logs du serveur
+   - Vérifier les permissions
+
+2. **Erreur 404 (Not Found)** :
+   - Vérifier que la route existe
+   - Vérifier que le contrôleur est correctement configuré
+
+3. **Erreur 403 (Forbidden)** :
+   - Vérifier les permissions dans l'interface d'administration
+   - Vérifier le token JWT
+
+### Bonnes pratiques
+
+1. **Structure** :
+   - Toujours créer les 4 fichiers (schema, controller, routes, service)
+   - Suivre la convention de nommage de Strapi
+
+2. **Permissions** :
+   - Configurer les permissions dans l'interface d'administration
+   - Documenter les permissions requises
+
+3. **Logs** :
+   - Ajouter des logs dans les contrôleurs
+   - Utiliser des messages d'erreur descriptifs
+
 ## Modèles de Données
 
 ### Resource
