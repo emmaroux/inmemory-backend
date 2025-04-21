@@ -486,8 +486,8 @@ Exemple de schéma pour un modèle :
   },
   "attributes": {
     "name": {
-      "type": "string",
-      "required": true
+      type: "string",
+      required: true
     },
     "relation": {
       "type": "relation",
@@ -558,4 +558,239 @@ Exemple de schéma pour un modèle :
 2. **Maintenance**
    - Ajout de logs pour faciliter le débogage
    - Documentation des changements de configuration
-   - Versionnement des modifications importantes 
+   - Versionnement des modifications importantes
+
+## Seeding des Données
+
+### Structure et Configuration
+
+Le seeding des données dans Strapi se fait via le fichier `src/index.js`. C'est le point d'entrée principal de l'application où le bootstrap est exécuté.
+
+1. **Création du script de seeding**
+   - Créer un fichier `scripts/seed.js` à la racine du projet
+   - Ce fichier contient la logique de création des données de test
+
+2. **Configuration du bootstrap**
+   - Dans `src/index.js`, ajouter l'import du script de seeding
+   - Implémenter la logique dans la fonction `bootstrap`
+
+Exemple de configuration :
+
+```javascript
+// src/index.js
+const seed = require('../scripts/seed');
+
+module.exports = {
+  async bootstrap({ strapi }) {
+    try {
+      // Attendre que Strapi soit complètement initialisé
+      await new Promise(resolve => setTimeout(resolve, 5000));
+
+      // Exécution du script de seeding
+      await seed(strapi);
+    } catch (error) {
+      console.error('Erreur lors du seeding :', error);
+      throw error;
+    }
+  },
+};
+```
+
+### Bonnes Pratiques
+
+1. **Structure du script de seeding**
+   - Créer les données dans l'ordre logique (dépendances d'abord)
+   - Utiliser des logs détaillés pour suivre le processus
+   - Gérer les erreurs proprement
+
+2. **Gestion des données**
+   - Vérifier l'existence des données avant de les créer
+   - Utiliser des données réalistes mais distinctes
+   - Documenter la structure des données générées
+
+3. **Sécurité**
+   - Ne pas inclure de données sensibles
+   - Utiliser des mots de passe sécurisés pour les utilisateurs de test
+   - Ne pas exposer le script en production
+
+### Exemple de Script de Seeding
+
+```javascript
+// scripts/seed.js
+const { faker } = require('@faker-js/faker');
+
+module.exports = async (strapi) => {
+  try {
+    // Création des catégories
+    const categories = await Promise.all([
+      strapi.entityService.create('api::category.category', {
+        data: {
+          name: 'IA',
+          description: 'Intelligence Artificielle et Machine Learning'
+        }
+      }),
+      // ... autres catégories
+    ]);
+
+    // Création des équipes
+    const teams = await Promise.all([
+      strapi.entityService.create('api::team.team', {
+        data: {
+          name: 'Équipe Alpha',
+          color: '#4F46E5'
+        }
+      }),
+      // ... autres équipes
+    ]);
+
+    // Création des utilisateurs
+    const users = await Promise.all([
+      strapi.entityService.create('plugin::users-permissions.user', {
+        data: {
+          username: 'user1',
+          email: 'user1@test.com',
+          password: 'password123',
+          confirmed: true,
+          blocked: false,
+          role: 1
+        }
+      }),
+      // ... autres utilisateurs
+    ]);
+
+    // Pour chaque ressource existante
+    const resources = await strapi.entityService.findMany('api::resource.resource');
+    for (const resource of resources) {
+      // Attribution d'une catégorie
+      await strapi.entityService.update('api::resource.resource', resource.id, {
+        data: {
+          category: faker.helpers.arrayElement(categories).id
+        }
+      });
+
+      // Création de votes
+      for (let i = 0; i < faker.number.int({ min: 3, max: 4 }); i++) {
+        await strapi.entityService.create('api::vote.vote', {
+          data: {
+            value: faker.number.int({ min: 1, max: 5 }),
+            user: faker.helpers.arrayElement(users).id,
+            resource: resource.id,
+            team: faker.helpers.arrayElement(teams).id
+          }
+        });
+      }
+
+      // Création de commentaires
+      for (let i = 0; i < faker.number.int({ min: 2, max: 3 }); i++) {
+        await strapi.entityService.create('api::comment.comment', {
+          data: {
+            content: faker.lorem.paragraph(),
+            date: faker.date.recent(),
+            resource: resource.id,
+            team: faker.helpers.arrayElement(teams).id,
+            user: faker.helpers.arrayElement(users).id
+          }
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Erreur lors du seeding :', error);
+    throw error;
+  }
+};
+```
+
+### Dépannage
+
+1. **Erreurs courantes**
+   - Module non trouvé : vérifier le chemin d'importation
+   - Erreurs de dépendances : s'assurer que les données sont créées dans le bon ordre
+   - Erreurs de permissions : vérifier les droits d'accès aux services
+
+2. **Logs et débogage**
+   - Ajouter des logs détaillés à chaque étape
+   - Utiliser des messages d'erreur descriptifs
+   - Vérifier les logs du serveur
+
+3. **Optimisation**
+   - Utiliser `Promise.all` pour les opérations parallèles
+   - Limiter le nombre de données générées
+   - Nettoyer les données existantes si nécessaire
+
+## Configuration d'une nouvelle API
+
+### Ordre des étapes
+
+1. **Structure de base**
+   - Créer le dossier de l'API dans `src/api/`
+   - Créer les dossiers `content-types`, `controllers`, `routes`, `services`
+
+2. **Configuration du contenu**
+   - Définir le schéma dans `content-types/[nom]/schema.json`
+   - Configurer les relations avec les autres entités
+
+3. **Configuration des services**
+   - Créer le service dans `services/[nom].js`
+   - Utiliser `createCoreService` de Strapi
+   ```javascript
+   'use strict';
+   const { createCoreService } = require('@strapi/strapi').factories;
+   module.exports = createCoreService('api::[nom].[nom]');
+   ```
+
+4. **Configuration des permissions**
+   - Accéder à l'interface d'administration (http://localhost:1337/admin)
+   - Aller dans Settings > Users & Permissions Plugin > Roles
+   - Configurer les permissions pour l'API (find, findOne, create, update, delete)
+
+5. **Test de l'API**
+   - Redémarrer le serveur Strapi
+   - Tester les endpoints avec authentification
+   - Vérifier les relations et les données retournées
+
+### Exemple complet pour les commentaires
+
+1. Structure :
+```
+src/api/comment/
+├── content-types/
+│   └── comment/
+│       └── schema.json
+├── controllers/
+│   └── comment.js
+├── routes/
+│   └── comment.js
+└── services/
+    └── comment.js
+```
+
+2. Service :
+```javascript
+'use strict';
+const { createCoreService } = require('@strapi/strapi').factories;
+module.exports = createCoreService('api::comment.comment');
+```
+
+3. Permissions :
+- Activer les permissions pour les rôles concernés
+- Configurer les accès aux relations (resource, team)
+
+4. Test :
+```bash
+# Authentification
+curl -X POST "http://localhost:1337/api/auth/local" \
+  -H "Content-Type: application/json" \
+  -d '{"identifier":"[username]","password":"[password]"}'
+
+# Récupération des commentaires
+curl -X GET "http://localhost:1337/api/comments?populate=*" \
+  -H "Authorization: Bearer [token]"
+```
+
+### Bonnes pratiques
+
+- Toujours créer le service avant de tester l'API
+- Vérifier les permissions dans l'interface d'administration
+- Tester avec authentification
+- Documenter les endpoints et les relations
+- Utiliser le seeding pour les données de test 
