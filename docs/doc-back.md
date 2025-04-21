@@ -334,4 +334,50 @@ Headers: {
 4. **Maintenance**
    - Logger les erreurs importantes
    - Documenter les changements de schéma
-   - Versionner les migrations de base de données 
+   - Versionner les migrations de base de données
+
+## Résolution des problèmes courants
+
+### Problème de modèles manquants
+Si vous rencontrez une erreur du type "Metadata for 'api::model.model' not found", cela signifie qu'un modèle est référencé mais n'existe pas dans le système de fichiers. Pour résoudre ce problème :
+
+1. Vérifiez que le modèle existe dans le dossier `src/api/`
+2. Si le modèle n'existe pas, créez-le avec la structure suivante :
+   ```
+   src/api/[model]/
+   ├── content-types/
+   │   └── [model]/
+   │       └── schema.json
+   ├── controllers/
+   │   └── [model].js
+   └── routes/
+       └── [model].js
+   ```
+3. Assurez-vous que les relations entre les modèles sont correctement définies dans les schémas
+
+Exemple de schéma pour un modèle :
+```json
+{
+  "kind": "collectionType",
+  "collectionName": "models",
+  "info": {
+    "displayName": "Model",
+    "pluralName": "models",
+    "singularName": "model"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "relation": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::other-model.other-model"
+    }
+  }
+}
+``` 
