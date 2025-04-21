@@ -496,4 +496,66 @@ Exemple de schéma pour un modèle :
     }
   }
 }
-``` 
+```
+
+## Historique des Modifications Récentes
+
+### Résolution des Problèmes de Modèles Manquants
+
+1. **Création du modèle Category**
+   - Structure créée manuellement :
+     ```
+     src/api/category/
+     ├── content-types/
+     │   └── category/
+     │       └── schema.json
+     ├── controllers/
+     │   └── category.js
+     ├── routes/
+     │   └── category.js
+     └── services/
+         └── category.js
+     ```
+   - Ajout des relations avec le modèle Resource
+   - Configuration des permissions dans l'interface d'administration
+
+2. **Création du modèle Comment**
+   - Structure similaire au modèle Category
+   - Relations avec les modèles User, Resource et Team
+   - Configuration des permissions appropriées
+
+### Désactivation du Seeding Automatique
+
+1. **Suppression du script de seeding**
+   - Suppression du fichier `scripts/seed.js`
+   - Modification de `config/database.js` pour retirer les références au seeding
+   - Mise à jour de `src/index.js` pour supprimer la logique de seeding
+
+2. **Configuration des Permissions**
+   - Mise à jour de `config/plugins/users-permissions.js`
+   - Configuration des permissions pour les routes Category
+   - Ajout de l'authentification requise pour les endpoints sensibles
+
+### Amélioration du Débogage
+
+1. **Ajout de Logs Détaillés**
+   - Implémentation de logs dans les contrôleurs
+   - Suivi des requêtes et des réponses
+   - Gestion des erreurs avec messages descriptifs
+
+2. **Documentation des Erreurs Courantes**
+   - Erreur 500 : Vérification des services manquants
+   - Erreur 404 : Vérification des routes
+   - Erreur 403 : Vérification des permissions
+
+### Bonnes Pratiques Mises en Place
+
+1. **Structure des APIs**
+   - Vérification systématique de la présence des 4 composants (schema, controller, routes, service)
+   - Documentation des relations entre les modèles
+   - Configuration des permissions au niveau le plus granulaire
+
+2. **Maintenance**
+   - Ajout de logs pour faciliter le débogage
+   - Documentation des changements de configuration
+   - Versionnement des modifications importantes 

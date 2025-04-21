@@ -1,7 +1,5 @@
 'use strict';
 
-const { seedDatabase } = require('../scripts/seed');
-
 module.exports = {
   /**
    * An asynchronous register function that runs before
@@ -29,14 +27,10 @@ module.exports = {
       console.log('=== Vérification de l\'instance Strapi ===');
       console.log('Strapi est-il défini ?', !!strapi);
       console.log('Type de Strapi:', typeof strapi);
-      
-      console.log('\n=== Démarrage du processus de seeding ===');
-      await seedDatabase({ strapi });
-      console.log('\n=== Seeding terminé avec succès ===');
     } catch (error) {
       console.error('\n');
       console.error('#############################################');
-      console.error('### ERREUR CRITIQUE LORS DU SEEDING ###');
+      console.error('### ERREUR CRITIQUE LORS DU BOOTSTRAP ###');
       console.error('#############################################');
       console.error('Message:', error.message);
       console.error('Stack:', error.stack);

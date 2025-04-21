@@ -1,0 +1,39 @@
+{
+  "name": "Authenticated",
+  "description": "Default role given to authenticated user.",
+  "type": "authenticated",
+  "permissions": [
+    {
+      "action": "plugin::users-permissions.auth.callback",
+      "subject": null
+    },
+    {
+      "action": "plugin::users-permissions.auth.connect",
+      "subject": null
+    },
+    {
+      "action": "plugin::users-permissions.auth.register",
+      "subject": null
+    },
+    {
+      "action": "plugin::users-permissions.user.me",
+      "subject": null
+    },
+    {
+      "action": "api::category.category.find",
+      "subject": null
+    },
+    {
+      "action": "api::category.category.findOne",
+      "subject": null
+    },
+    {
+      "action": "api::resource.resource.find",
+      "subject": null
+    },
+    {
+      "action": "api::resource.resource.findOne",
+      "subject": null
+    }
+  ]
+} 

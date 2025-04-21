@@ -1,5 +1,4 @@
 const path = require('path');
-const { seedDatabase } = require('../scripts/seed');
 
 module.exports = ({ env }) => ({
   connection: {
@@ -29,11 +28,6 @@ module.exports = ({ env }) => ({
       console.log('=== Vérification de l\'instance Strapi ===');
       console.log('Strapi est-il défini ?', !!strapi);
       console.log('Type de Strapi:', typeof strapi);
-      
-      // Désactivation du seeding car nous avons déjà des données en production
-      // console.log('\n=== Démarrage du processus de seeding ===');
-      // await seedDatabase({ strapi });
-      // console.log('\n=== Seeding terminé avec succès ===');
     } catch (error) {
       console.error('\n');
       console.error('#############################################');
