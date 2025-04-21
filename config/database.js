@@ -30,13 +30,14 @@ module.exports = ({ env }) => ({
       console.log('Strapi est-il défini ?', !!strapi);
       console.log('Type de Strapi:', typeof strapi);
       
-      console.log('\n=== Démarrage du processus de seeding ===');
-      await seedDatabase({ strapi });
-      console.log('\n=== Seeding terminé avec succès ===');
+      // Désactivation du seeding car nous avons déjà des données en production
+      // console.log('\n=== Démarrage du processus de seeding ===');
+      // await seedDatabase({ strapi });
+      // console.log('\n=== Seeding terminé avec succès ===');
     } catch (error) {
       console.error('\n');
       console.error('#############################################');
-      console.error('### ERREUR CRITIQUE LORS DU SEEDING ###');
+      console.error('### ERREUR CRITIQUE LORS DU BOOTSTRAP ###');
       console.error('#############################################');
       console.error('Message:', error.message);
       console.error('Stack:', error.stack);
